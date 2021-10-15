@@ -1,0 +1,9 @@
+*.env
+*.cert
+.*.swp
+.config
+node_modules/
+**/mongodb/data/**
+**/redis/data/**
+.bash_history
+**/testdata-generator.js

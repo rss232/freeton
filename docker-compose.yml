@@ -1,0 +1,132 @@
+version: '3.7'
+  
+x-app: &default-vars
+  environment:
+    - ATTEMPTS
+    - WEB_PROTOCOL
+    - WEB_PORT
+    - WEB_INTERFACE
+    - REDIS_PORT
+    - REDIS_HOST
+    - REDIS_PASSWORD
+    - DEDUP_SECONDS
+    - KAFKA_BROKERS
+    - KAFKA_USER
+    - KAFKA_PASSWORD
+    - KAFKA_CLIENT_ID
+    - KAFKA_GROUP_ID
+    - KAFKA_TOPIC
+    - MONGO_PORT
+    - MONGO_HOST
+    - MONGO_INITDB_ROOT_USERNAME
+    - MONGO_INITDB_ROOT_PASSWORD
+    - MONGO_INITDB_DATABASE
+    - MONGO_CONCURRENCY_LEVEL
+    - TESTS
+    - FQDN
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE
+
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+    volumes:
+      - ./volumes/mongodb/data/db:/data/db
+      - ./volumes/mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+    networks:
+      - some-net
+
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}" ]
+    ports:
+     - "${REDIS_PORT}:${REDIS_PORT}"
+
+    volumes:
+     - ./volumes/redis/data:/data
+    networks:
+      - some-net
+
+
+  webserver:
+    image: node:lts-buster
+    user: "node"
+    hostname: webserver
+    container_name: webserver
+    restart: unless-stopped
+    volumes:
+      - ./src:/home/node
+      - ./node_modules:/home/node/node_modules
+    ports:
+      - "${WEB_PORT}:${WEB_PORT}"
+
+    working_dir: "/home/node"
+    command: ["node","webserver/main.js"]
+    <<: *default-vars
+    networks:
+      - some-net
+
+
+  sender:
+    image: node:lts-buster
+    user: "node"
+    hostname: sender
+    container_name: sender
+    restart: unless-stopped
+    volumes:
+      - ./src:/home/node
+      - ./node_modules:/home/node/node_modules
+
+    working_dir: "/home/node"
+    command: ["node","--max-old-space-size=4096","sender/main.js"]
+    <<: *default-vars
+    networks:
+      - some-net
+
+
+  kafka-connect:
+    image: node:lts-buster
+    user: "node"
+    hostname: kafka-connect
+    container_name: kafka-connect
+    restart: unless-stopped
+    volumes:
+      - ./src:/home/node
+      - ./node_modules:/home/node/node_modules
+
+    working_dir: "/home/node"
+    command: ["node","--max-old-space-size=4096","kafka-connect/main.js"]
+    <<: *default-vars
+    networks:
+      - some-net
+
+  testserver:
+    image: node:lts-buster
+    user: "node"
+    hostname: testserver
+    container_name: testserver
+    restart: unless-stopped
+    volumes:
+      - ./src:/home/node
+      - ./node_modules:/home/node/node_modules
+    ports:
+      - 3000
+
+    working_dir: "/home/node"
+    command: ["node","node_modules/nodemon/bin/nodemon.js","webserver/console-web-server.js"]
+    networks:
+      - some-net
+
+
+networks:
+  some-net:
+    name: testnet
+    driver: bridge
