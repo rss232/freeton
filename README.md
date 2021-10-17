@@ -55,4 +55,20 @@ Depending on the volume of the load, you can choose the following scaling method
   URL confirmed, use this link to get your statistics:
   https://toncontest.tmweb.ru/stats?token=5024fa-486e-df83-02a822
   ```
+## Statistics
+Using the access token you got when registering your webhook (see above), you can get the number of successful POST requests to your URL with a one minute resolution.
 
+```
+GET https://toncontest.tmweb.ru/stats?token=<your_token>&from=<YYYY-MM-DD>&to<YYYY-MM-DD>
+```
+
+Result contains an array: `[unix_time_stamp, number_of_notifications]`
+
+```
+{
+  "from":"2021-10-17",
+  "to":"2021-10-20",
+  "url":"https://your.site.ru/webhook",
+  "data":[[1634479320,5],[1634479380,7],[1634479440,4],[1634479500,5]
+}
+```

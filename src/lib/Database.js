@@ -20,11 +20,21 @@ class Database {
         await this.client.connect()
         const db = this.client.db(this.dbname)
         this.clientCollection = db.collection(this.collections.client)
+        this.statCollection = db.collection(this.collections.stat)
         console.log('Connected successfully to server')
     }
 
     async getClientRecord(clientId) {
         return this.clientCollection.findOne({ clientId }, { _id: -1 })
+    }
+
+    async getClientUrlByToken(accessToken) {
+        return this.clientCollection
+            .findOne(
+                { 'confirmed.accessToken': accessToken },
+                { projection: { confirmed: { url: 1 }, _id: 0 } },
+            )
+            .then((m) => (m ? m.confirmed.url : m))
     }
 
     async getClientUrl(clientId) {
@@ -47,6 +57,16 @@ class Database {
             { $set: { confirmed } },
             { upsert: false },
         )
+    }
+
+    async saveStat({ ts, stat }) {
+        return this.statCollection.updateOne({ ts }, { $set: { stat } }, { upsert: true })
+    }
+
+    async getStat({ from, to }) {
+        return this.statCollection
+            .find({ $and: [{ ts: { $gte: from } }, { ts: { $lte: to } }] })
+            .toArray()
     }
 }
 

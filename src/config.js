@@ -7,7 +7,7 @@ const config = {
         /*
          * Messages are batched for high throughputf.
          * To disable this feature set the value to 0
-         * if the size of one original message exceeds 
+         * if the size of one original message exceeds
          * the specified value, then this rule is ignored
          */
         maxPostSize: 1048576, // 1Mb
@@ -46,6 +46,12 @@ const config = {
          */
         removeOnComplete: true,
     },
+    statOpts: {
+        /*
+         * Granularity of statistics
+         */
+        period: 'minute',
+    },
     /*
      *  Redis is used as a message queue, and it also caches
      *  the IDs of already sent messages for deduplication.
@@ -74,6 +80,7 @@ const config = {
          */
         collections: {
             client: 'requests',
+            stat: 'stat',
         },
     },
 
@@ -106,6 +113,8 @@ const config = {
                 '- or the new URL, to replace the previous one',
             E_FILE_NOT_EXISTS: "Check failed, can't GET",
             E_ACCESS: 'Check failed',
+            E_TOKEN_REQUIRED: 'Token required',
+            E_TOKEN_VALIDATION: 'Token not valid',
             E_INTERNAL: ':-( Something went wrong, please try again',
             URL_CONFIRMED: 'URL endpoint confirmed, use this link to get your statistics:',
         },

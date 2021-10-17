@@ -1,6 +1,6 @@
 const assert = require('assert')
 const R = require('ramda')
-const cache = require('node-cache')
+const Cache = require('node-cache')
 const { concurrent, serial } = require('fasy')
 
 const { splitBySize, calcDelay } = require('../lib')
@@ -14,10 +14,9 @@ const {
 const groupByUrl = R.pipe(R.groupBy(R.prop('url')), R.values)
 const split = splitBySize(maxPostSize)
 
-const clientCache = new cache({ stdTTL: 60, checkperiod: 120 })
+const clientCache = new Cache({ stdTTL: 60, checkperiod: 120 })
 
 const processor = (queue, redis, db) => async ({ batch, resolveOffset, heartbeat }) => {
-
     const deserMsgs = batch.rawMessages.map((m) => {
         const key = m.key.toString()
         const [hash, nonce, message] = m.value.toString().split(' ')

@@ -1,9 +1,10 @@
 const Queue = require('bull')
 
 const { Redis, calcDelay } = require('../lib')
-const { dedupTTL, redisOpts, httpOpts } = require('../config')
+const { dedupTTL, redisOpts, httpOpts, mongoOpts, statOpts } = require('../config')
 
 const { post } = require('./post')
+const { Stats } = require('./Stats')
 const { strategies } = require('./backoffStrategies')
 
 class JobError extends Error {
@@ -30,6 +31,9 @@ const main = async () => {
             settings: { backoffStrategies: strategies(onAttemptFn) },
         })
 
+        const stat = new Stats({ mongoOpts, statOpts })
+        await stat.init()
+
         const handler = async (job) => {
             const { url, payload } = job.data
 
@@ -41,10 +45,8 @@ const main = async () => {
                 if (await limiter(url)) {
                     const result = await post(url, payload)
                     if (result.ok) {
-                        /*
-                         *  Statistics should be collected here
-                         *
-                         */
+                        // Gathering statistics
+                        await stat.gather({ url })
                     } else {
                         throw new JobError({ url, originalErr: result.err })
                     }

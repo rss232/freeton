@@ -1,9 +1,14 @@
 const cors = require('cors')
+const moment = require('moment')
 const express = require('express')
 const createError = require('http-errors')
+const { reject, isNil, filter, map, propEq } = require('ramda')
 
 const UserInput = require('./UserInput')
 const { b64ToStr } = require('../lib')
+const {
+    frontOpts: { messages },
+} = require('../config')
 
 const app = express()
 app.use(
@@ -30,9 +35,40 @@ module.exports = (db) => {
         }),
     )
 
-    app.get('/stats', (req, res) => {
-       return res.send('Maybe there will be a statistics page, but not now') 
-    })
+    app.get(
+        '/stats',
+        expressTryCatch(async (req, res, next) => {
+            const { token, from, to } = req.query
+
+            if (!token) return next(createError(400, messages.E_TOKEN_REQUIRED))
+
+            const url = await db.getClientUrlByToken(token)
+            if (!url) return next(createError(401, messages.E_TOKEN_VALIDATION))
+
+            const momentFrom = moment(from).startOf('day')
+            const momentTo = moment(to).endOf('day')
+
+            const data = await db
+                .getStat({
+                    from: momentFrom.unix(),
+                    to: momentTo.unix(),
+                })
+                .then(
+                    map((o) => {
+                        const [y] = filter(propEq('url', url), o.stat)
+                        return y ? [o.ts, y.val] : null
+                    }),
+                )
+                .then(reject(isNil))
+
+            return res.json({
+                from: momentFrom.format('YYYY-MM-DD'),
+                to: momentTo.format('YYYY-MM-DD'),
+                url,
+                data,
+            })
+        }),
+    )
 
     app.use((req, res, next) => {
         next(createError(404))
