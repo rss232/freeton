@@ -1,6 +1,6 @@
 # HTTP Notification Provider
 
-Simple, with a tiny codebase service, on top of the most reliable, Redis-based queue, that is easy to maintain and scale. 
+Simple, with a tiny codebase service, on top of the most reliable Redis-based queue, that is easy to maintain and scale. 
 
 ## Main features
  - Messages are batched by URL for high throughput
@@ -55,6 +55,7 @@ Depending on the volume of the load, you can choose the following scaling method
   URL confirmed, use this link to get your statistics:
   https://toncontest.tmweb.ru/stats?token=5024fa-486e-df83-02a822
   ```
+
 ## Statistics
 Using the access token you got when registering your webhook (see above), you can get the number of successful POST requests to your URL with a one minute resolution.
 
