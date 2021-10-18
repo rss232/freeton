@@ -117,11 +117,12 @@ services:
     volumes:
       - ./src:/home/node
       - ./node_modules:/home/node/node_modules
-    ports:
+    expose:
       - 3000
 
+    # 30% of requests will be failed
     working_dir: "/home/node"
-    command: ["node","node_modules/nodemon/bin/nodemon.js","webserver/console-web-server.js"]
+    command: ["node","webserver/console-web-server.js", "30" ]
     networks:
       - some-net
 

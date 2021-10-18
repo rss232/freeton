@@ -1,5 +1,5 @@
 #!/bin/bash
-TEST_MESSAGES=test/messagess.txt
+TEST_MESSAGES=test/messages.txt
 
 CONTAINER=`docker ps | grep confluentinc/cp-kafka | awk '{print $(NF)}'`
 if [ -z "$CONTAINER" ]; then
@@ -7,7 +7,9 @@ if [ -z "$CONTAINER" ]; then
         exit 1
 fi
 
-echo "Producing records to Kafka"
+N_MESSAGES=`awk 'END{print NR}' ${TEST_MESSAGES}`
+
+echo "Sending ${N_MESSAGES} messages to Kafka"
 
 docker exec -i  ${CONTAINER} kafka-console-producer \
   --topic testtopic \
@@ -15,5 +17,8 @@ docker exec -i  ${CONTAINER} kafka-console-producer \
   --property parse.key=true \
   --property key.separator=":"  < ${TEST_MESSAGES} 
 
+
 echo "Done, all records sent to Kafka"
 
+echo "test server should receive ${N_MESSAGES}"
+docker-compose logs -f testserver

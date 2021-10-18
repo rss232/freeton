@@ -52,7 +52,7 @@ const main = async () => {
                     }
                 } else {
                     // No free connections for this url
-                    throw new JobError({ url })
+                    throw new JobError({ url, originalErr: { rateLimit: true } })
                 }
             } else {
                 // Backoff this message

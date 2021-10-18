@@ -11,11 +11,18 @@ app.use(express.urlencoded({ extended: true }))
  * total length, then we can compare the results
  * This will be a pretty accurate test.
  */
-app.post('/webhook', (req, res) => {
 
-    if (Date.now() % 4 === 0) {
-        // 25%
-        return res.status(500)
+function printline() {
+    const args = [...arguments]
+    console.log(args.map((n) => n.toString(10).padEnd(18, ' ')).join(''))
+}
+
+const failPercent = parseInt(process.argv[2], 10) || 0
+
+app.post('/webhook', (req, res) => {
+    if (Date.now() % Math.round(100 / failPercent) === 0) {
+        console.log('HTTP status 500 sent')
+        return res.status(500).end()
     }
 
     const xs = req.body
@@ -23,11 +30,7 @@ app.post('/webhook', (req, res) => {
     counter.msgs += xs.length
     counter.len += xs.reduce((a, c) => a + c.length, 0)
 
-    console.log(
-        [counter.total, counter.msgs, counter.len]
-            .map((n) => n.toString(10).padEnd(20, ' '))
-            .join(''),
-    )
+    printline(counter.total, counter.msgs, counter.len)
     res.end()
 })
 app.get('/webhook', (req, res) => {
@@ -36,4 +39,6 @@ app.get('/webhook', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Test webhook server  listening at http://localhost:${port}`)
+    console.log('%d% of request aprox will be failed with HTTP status 500\n', failPercent)
+    printline('Requests', 'Messages', 'Total size')
 })

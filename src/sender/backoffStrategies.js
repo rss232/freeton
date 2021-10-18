@@ -1,5 +1,4 @@
 const strategies = (onAttemptFn) => ({
-
     exponential: (attemptsMade, err) => {
         const url = err.url
         // eslint-disable-next-line no-unused-vars
@@ -11,18 +10,21 @@ const strategies = (onAttemptFn) => ({
          */
         let delayMs
 
-        if (originalErr) {
-            delayMs = Math.round((Math.pow(2, attemptsMade) + Math.random()) * 1000)
-
-            console.log('Attempt number %d, delay for %d ms because of errors', attemptsMade, delayMs)
-
-            // Fire and forget. we don't want to handle errors
-            onAttemptFn(url, attemptsMade, delayMs).catch(console.log)
-        } else {
+        if (originalErr && originalErr.rateLimit) {
             delayMs = Math.round((2 + Math.random()) * 1000)
-            console.log( 'Attempt number %d, next delay till %d', attemptsMade, delayMs)
+            console.log('Attempt %d, delaying next post for %d ms', attemptsMade, delayMs)
+        } else {
+            delayMs = Math.round((Math.pow(2, attemptsMade) + Math.random()) * 1000)
+            console.log(
+                'Attempt %d, delaying next post for %d ms because of errors',
+                attemptsMade,
+                delayMs,
+            )
+            if (originalErr) {
+                // Fire and forget. we don't want to handle errors
+                onAttemptFn(url, attemptsMade, delayMs).catch(console.log)
+            }
         }
-
         return delayMs
     },
 })

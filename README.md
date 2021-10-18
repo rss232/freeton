@@ -75,9 +75,56 @@ Result contains an array: `[unix_time_stamp, number_of_notifications]`
 }
 ```
 
----
+## Testing
 
-### Monitoring & Alerting
+### Prerequisites:
+ - npm installed
+ - docker installed
+ 
+```
+[freeton]$ npm i
+[freeton]$ ./start_up.sh
+[freeton]$ ./test-run.sh
+```
+```
+Sending 50 messages to Kafka
+Done, all records sent to Kafka
+
+test server should receive 50
+
+Attaching to testserver
+testserver       | Test webhook server  listening at http://localhost:3000
+testserver       | 30% of request aprox will be failed with HTTP status 500
+testserver       | Requests          Messages          Total size
+testserver       | 1                 3                 7311
+testserver       | 2                 6                 14622
+testserver       | 3                 9                 21933
+testserver       | HTTP status 500 sent
+testserver       | 4                 12                29244
+testserver       | 5                 15                36555
+testserver       | HTTP status 500 sent
+testserver       | 6                 18                43866
+testserver       | 7                 21                51177
+testserver       | 8                 24                58488
+testserver       | HTTP status 500 sent
+testserver       | 9                 27                65799
+testserver       | 10                30                73110
+testserver       | HTTP status 500 sent
+testserver       | 11                33                80421
+testserver       | 12                36                87732
+testserver       | 13                38                92606
+testserver       | HTTP status 500 sent
+testserver       | HTTP status 500 sent
+testserver       | HTTP status 500 sent
+testserver       | 14                41                99917
+testserver       | 15                44                107228
+testserver       | 16                47                114539
+testserver       | 17                50                121850
+^C: Aborting.
+[freeton]$
+```
+
+## Monitoring & Alerting
 
 - With Prometheus [Bull Queue Exporter](https://github.com/UpHabit/bull_exporter)
 

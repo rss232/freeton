@@ -10,7 +10,7 @@ const config = {
          * if the size of one original message exceeds
          * the specified value, then this rule is ignored
          */
-        maxPostSize: 1048576, // 1Mb
+        maxPostSize: 8200,  // 8k
         /*
          * The maximum total number of POST connections from all our servers
          */
