@@ -15,6 +15,7 @@ This service consists of several microservices, connected throw a message queue
  - HTTP-senders - node.js microservices
  - MongoDb - Store user configuration and statistics
 
+We are using Bull.js. You can read more about here: [Bull.js](https://optimalbits.github.io/bull/)
   
 ## Scaling
 Depending on the volume of the load, you can choose the following scaling methods:
@@ -57,7 +58,7 @@ Depending on the volume of the load, you can choose the following scaling method
   ```
 
 ## Statistics
-Using the access token you got when registering your webhook (see above), you can get the number of successful POST requests to your URL with a one minute resolution.
+Using the access token you got when registering your webhook (see above), you can get the number of successful POST requests to your URL with a one minute resolution. The maximum date range for each request is one month, so no pagination is required.
 
 ```
 GET https://toncontest.tmweb.ru/stats?token=<your_token>&from=<YYYY-MM-DD>&to<YYYY-MM-DD>
@@ -73,3 +74,10 @@ Result contains an array: `[unix_time_stamp, number_of_notifications]`
   "data":[[1634479320,5],[1634479380,7],[1634479440,4],[1634479500,5]
 }
 ```
+
+---
+
+### Monitoring & Alerting
+
+- With Prometheus [Bull Queue Exporter](https://github.com/UpHabit/bull_exporter)
+
