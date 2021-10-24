@@ -2,6 +2,11 @@
 
 Simple, with a tiny codebase service, on top of the most reliable Redis-based queue, that is easy to maintain and scale. 
 
+## Disclaimer 
+This code was written for the [TON contest](https://forum.freeton.org/t/notification-service-1/11514).
+The backoff algorithm is fairly simple, but it can be made more complex for production use.
+Please ask your questions and suggestions in Telegram [@RSila](https://t.me/RSila)
+
 ## Main features
  - Messages are batched by URL for high throughput
  - Easy to apply different backoff strategies 
