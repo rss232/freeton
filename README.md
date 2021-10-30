@@ -88,7 +88,7 @@ Result contains an array: `[unix_time_stamp, number_of_notifications]`
  
 ```
 [freeton]$ npm i
-[freeton]$ ./start_up.sh
+[freeton]$ ./test-up.sh
 [freeton]$ ./test-run.sh
 ```
 ```
