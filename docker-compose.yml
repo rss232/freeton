@@ -122,7 +122,7 @@ services:
 
     # 30% of requests will be failed
     working_dir: "/home/node"
-    command: ["node","webserver/console-web-server.js", "30" ]
+    command: ["node","webserver/console-web-server.js", "15" ]
     networks:
       - some-net
 
